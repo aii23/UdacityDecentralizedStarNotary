@@ -1,4 +1,5 @@
 const StarNotary = artifacts.require("StarNotary");
+const { expect } = require('chai');
 
 var accounts;
 var owner;
@@ -133,4 +134,45 @@ it('lookUptokenIdToStarInfo test', async() => {
     await instance.createStar(starName, starId, {from: user});
     let actualStarName = await instance.lookUptokenIdToStarInfo.call(starId);
     assert.equal(actualStarName, starName);
+});
+
+it('can\'t transfer not owned star', async() => {
+    let instance = await StarNotary.deployed();
+    let starId = 10;
+    let starName = "Star";
+    let user1 = accounts[1];
+    let user2 = accounts[2];
+    await instance.createStar(starName, starId, {from: user1});
+
+    try {
+        await instance.transferStar(user2, starId, {from: user2});
+    } catch (e) {
+        return;
+    }
+
+    expect.fail('Can transfer not owned star');
+});
+
+it('can\'t change not owned star', async() => {
+    // 1. create 2 Stars with different tokenId
+    // 2. Call the exchangeStars functions implemented in the Smart Contract
+    // 3. Verify that the owners changed
+    let instance = await StarNotary.deployed();
+    let starId1 = 11;
+    let starName1 = "Star1";
+    let starId2 = 12;
+    let starName2 = "Star2";
+    let user1 = accounts[1];
+    let user2 = accounts[2];
+    let user3 = accounts[3];
+    await instance.createStar(starName1, starId1, {from: user1});
+    await instance.createStar(starName2, starId2, {from: user2});
+
+    try {
+        await instance.exchangeStars(starId1, starId2, {from: user3});
+    } catch(e) {
+        return;
+    }
+    
+    expect.fail('Can change not owned star');
 });
