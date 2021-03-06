@@ -24,6 +24,14 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+const HDWalletProvider = require('truffle-hdwallet-provider');
+const infuraKey = "2ca...";
+//
+// const fs = require('fs');
+// const mnemonic = fs.readFileSync(".secret").toString().trim();
+
+const private_key = "985...";
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -50,6 +58,13 @@ module.exports = {
     
     develop: {
       port: 8545
+    },
+
+    rinkeby: {
+      provider: () => new HDWalletProvider(private_key, `https://rinkeby.infura.io/v3/${infuraKey}`),
+        network_id: 4,       // rinkeby's id
+        gas: 4500000,        // rinkeby has a lower block limit than mainnet
+        gasPrice: 10000000000
     },
 
     // Another network with more advanced options...
